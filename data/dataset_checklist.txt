@@ -1,0 +1,11 @@
+phonology:
+	old_chinese:
+	middle_chinese:
+	modern_chinese:
+		dialects?
+
+glyph:
+	oracle_bone:
+	seal_script:
+	traditional:
+	modern:
