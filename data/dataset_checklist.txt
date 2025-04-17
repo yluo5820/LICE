@@ -5,7 +5,7 @@ phonology:
 		dialects?
 
 glyph:
-	oracle_bone:
-	seal_script:
-	traditional:
-	modern:
+	oracle_bone:T
+	seal_script:T
+	traditional:T
+	modern:T
