@@ -1,0 +1,16 @@
+Mandarin: 20,367
+
+Cantonese: 16,723
+
+Hokkien: 6,185
+
+Hakka: 3,269
+
+Wu: 2,877
+
+Jin: 1,409
+
+Xiang: 1,258
+
+Gan: 1,195
+

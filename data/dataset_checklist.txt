@@ -1,11 +1,13 @@
-phonology:
-	old_chinese:
-	middle_chinese:
-	modern_chinese:
-		dialects?
+CJK range: 27584
+Non-empty entries:
+	phonology:
+		old_chinese: 13094
+		middle_chinese: 20727
+		mandarin: 26673
+		cantonese: 19713
 
-glyph:
-	oracle_bone:T
-	seal_script:T
-	traditional:T
-	modern:T
+	glyph:
+		oracle_bone: 1650
+		seal_script: 13010
+		traditional: 25738
+		modern:T
