@@ -48,28 +48,32 @@ def add_char_to_pinyin_dict(char, char2pinyin):
         char2pinyin[chr(char)] = (None, None, None)
         return None
     # print(pinyin)
-    ipa = pinyin_to_ipa(pinyin)[0]
-    if len(ipa) == 3:
-        # print(ipa)
-        initial, mid, final = ipa
-        for tone in PINYIN_TONE:
-            if tone in mid:
-                fianl = mid.replace(tone, "") + final
-                char2pinyin[chr(char)] = (initial, fianl, tone)
-                break
-    elif len(ipa) == 2:
-        for tone in PINYIN_TONE:
-            if tone in ipa[0]: # no intial, (mid, final)
-                char2pinyin[chr(char)] = (None, ipa[0].replace(tone, "") + ipa[1], tone)
-                break
-            else: # no final, (initial, mid)
-                char2pinyin[chr(char)] = (ipa[0], ipa[1].replace(tone, ""), tone)
-                break
-    else: # only mid
-        for tone in PINYIN_TONE:
-            if tone in ipa[0]:
-                char2pinyin[chr(char)] = (None, ipa[0].replace(tone, ""), tone)
-                break
+    initial = lazy_pinyin(chr(char), style=Style.INITIALS)[0]
+    final = lazy_pinyin(chr(char), style=Style.FINALS)[0]
+    tone = lazy_pinyin(chr(char), style=Style.TONE3)[0][-1]
+    char2pinyin[chr(char)] = (initial if initial else None, final, tone)
+    # ipa = pinyin_to_ipa(pinyin)[0]
+    # if len(ipa) == 3:
+    #     # print(ipa)
+    #     initial, mid, final = ipa
+    #     for tone in PINYIN_TONE:
+    #         if tone in mid:
+    #             fianl = mid.replace(tone, "") + final
+    #             char2pinyin[chr(char)] = (initial, fianl, tone)
+    #             break
+    # elif len(ipa) == 2:
+    #     for tone in PINYIN_TONE:
+    #         if tone in ipa[0]: # no intial, (mid, final)
+    #             char2pinyin[chr(char)] = (None, ipa[0].replace(tone, "") + ipa[1], tone)
+    #             break
+    #         else: # no final, (initial, mid)
+    #             char2pinyin[chr(char)] = (ipa[0], ipa[1].replace(tone, ""), tone)
+    #             break
+    # else: # only mid
+    #     for tone in PINYIN_TONE:
+    #         if tone in ipa[0]:
+    #             char2pinyin[chr(char)] = (None, ipa[0].replace(tone, ""), tone)
+    #             break
 
 def add_char_to_cantonese_dict(char, ipa_dict, char2cantonese):
     yue_ipa = cantonese_to_ipa(chr(char), ipa_dict)
@@ -87,22 +91,22 @@ def add_char_to_cantonese_dict(char, ipa_dict, char2cantonese):
 
 if __name__ == "__main__":
     # Load IPA data
-    try:
-        ipa_dict = load_ipa_data('ipa_data.txt')
-        print(f"成功加载了 {len(ipa_dict)} 个IPA转换规则")
-    except Exception as e:
-        print(f"加载IPA数据时出错: {e}")
-        exit(1)
+    # try:
+    #     ipa_dict = load_ipa_data('ipa_data.txt')
+    #     print(f"成功加载了 {len(ipa_dict)} 个IPA转换规则")
+    # except Exception as e:
+    #     print(f"加载IPA数据时出错: {e}")
+    #     exit(1)
 
     for char in CJK:
         # Mandarin
-        # add_char_to_pinyin_dict(char, char2pinyin)
+        add_char_to_pinyin_dict(char, char2pinyin)
         # Cantonese
-        add_char_to_cantonese_dict(char, ipa_dict, char2cantonese)
+        # add_char_to_cantonese_dict(char, ipa_dict, char2cantonese)
     
     # Save the mapping to a file
-    # with open("mandarin.json", "w", encoding="utf-8") as f:
-    #     json.dump(char2pinyin, f, ensure_ascii=False, indent=2)
-    print(counter[0])
-    with open("cantonese.json", "w", encoding="utf-8") as f:
-        json.dump(char2cantonese, f, ensure_ascii=False, indent=2)
+    with open("mandarin.json", "w", encoding="utf-8") as f:
+        json.dump(char2pinyin, f, ensure_ascii=False, indent=2)
+    # print(counter[0])
+    # with open("cantonese.json", "w", encoding="utf-8") as f:
+    #     json.dump(char2cantonese, f, ensure_ascii=False, indent=2)

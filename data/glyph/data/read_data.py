@@ -1,16 +1,26 @@
 import json
-
-# with open("./oracle_bone_script/oracle2radical.json", "r", encoding="utf-8") as f:
-#     file =  json.load(f)
-
-# print(len(file))  # Output: 0
-
+from itertools import chain
 import pandas as pd
 
-# Read the CSV file
-df = pd.read_csv('IDS.csv')
-# Preview the first few rows
-print(df.head(20))
+NUM_RADICAL = 194
+
+with open("oracle_radical_CJK.json", "r", encoding="utf-8") as f:
+    oracle_dict =  json.load(f)
+
+def list_to_one_hot(alist, num_classes=NUM_RADICAL):
+    one_hot = [0] * num_classes
+    if alist == None:
+        return one_hot
+    for item in alist:
+        one_hot[item] = 1
+    return one_hot
+
+for key in oracle_dict.keys():
+    oracle_dict[key] = list_to_one_hot(oracle_dict[key])
+
+df = pd.DataFrame(list(oracle_dict.items()), columns=["char", "radical"])
+
+df.to_csv("oracle_radical_one_hot.csv", index=False, encoding="utf-8")
 
 # 去除异体字
 # def devarient_characters(s):
@@ -38,10 +48,3 @@ print(df.head(20))
 
 # print("total_len: ", len(file))
 # print(f"modern: {counter_2}")  # Output: seal: 0, trad: 0
-
-
-import json
-from itertools import chain
-from cjklib.characterlookup import CharacterLookup
-
-CJK = list(chain(range(0x4E00, 0xA000), range(0x3400, 0x4DC0)))  # 27k chars

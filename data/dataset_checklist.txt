@@ -11,3 +11,5 @@ Non-empty entries:
 		seal_script: 13010
 		traditional: 25738
 		modern:T
+
+Full data: https://drive.google.com/file/d/1j7gIGH-416UjdVidtekWgSwWaqCzgOsa/view?usp=sharing
