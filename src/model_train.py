@@ -23,6 +23,8 @@ class LIBGEWrapper(nn.Module):
     def __init__(self, model_name, pooling="mean", linguistic_map=None):
         super().__init__()
         self.model = AutoModel.from_pretrained(model_name)
+        for param in self.model.parameters():
+          param.requires_grad = False
         self.pooling = pooling
         hidden_dim = self.model.config.hidden_size
         self.fusion = nn.Sequential(

@@ -60,9 +60,9 @@ def load_model():
     return model
 
 def benchmark_model(model):
-    tasks = ["STS-B", "T2Retrieval", "PairClassification"]
-    evaluation = MTEB(tasks=tasks, task_lang="zh")
-    evaluation.run(model, output_folder="mteb_results/libge")
+    tasks = ["IFlyTek", "ThuNewsClusteringS2S.v2", "Ocnli", "MMarcoReranking", "BQ"]
+    evaluation = MTEB(tasks=tasks)
+    evaluation.run(model, output_folder="mteb_results/base")
     
 if __name__ == "__main__":
     model = get_model(MODEL_NAME)
