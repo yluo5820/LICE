@@ -9,12 +9,13 @@ import gc
 from transformers import AutoTokenizer, AutoModel, TrainingArguments, Trainer
 from datasets import load_dataset
 from sklearn.metrics import mean_squared_error
+from transformers import EarlyStoppingCallback
 
 import os
 os.environ["WANDB_DISABLED"] = "true"
 
 DIM_LING_INFO = 2007
-MODEL_NAME = "BAAI/bge-base-zh"
+MODEL_NAME = "BAAI/bge-base-zh-v1.5"
 MAX_LEN = 128
 
 ## 2. Custom Model Definition
@@ -133,8 +134,10 @@ def test_ling_map():
         print(f"Character '{test_char}' not found in linguistic map.")
 
 ## 7. Training Setup
-DATASET = "C-MTEB/STSB"
 if __name__ == "__main__":
+    DATASET = "C-MTEB/LCQMC"
+    IS_RELOAD = False
+    CHECKPOINT_DIR = "./checkpoints"
     ds = load_dataset(DATASET)
     ds = ds.map(tokenize_with_text)
     print(f"Dataset size: {len(ds['train'])} training samples, {len(ds['validation'])} validation samples")
@@ -144,14 +147,18 @@ if __name__ == "__main__":
 
     args = TrainingArguments(
         output_dir="./checkpoints",
-        per_device_train_batch_size=16,
+        per_device_train_batch_size=32,
         num_train_epochs=1,
         learning_rate=2e-5,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        logging_steps=10,
-        max_grad_norm=1.0,
-        warmup_steps=100,
+        eval_strategy="steps",  # Important for early stopping
+        eval_steps=500,
+        save_strategy="steps",
+        save_steps=500,
+        save_total_limit=3,
+        logging_steps=100,
+        load_best_model_at_end=True,
+        metric_for_best_model="loss",
+        greater_is_better=False,
         fp16=torch.cuda.is_available(),
     )
 
@@ -161,7 +168,11 @@ if __name__ == "__main__":
         train_dataset=ds["train"],
         eval_dataset=ds["validation"],
         data_collator=collate_fn,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
     )
 
     trainer.train()
+
+    results = trainer.evaluate()
+    print(results)
