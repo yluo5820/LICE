@@ -13,3 +13,23 @@ Non-empty entries:
 		modern:T
 
 Full data: https://drive.google.com/file/d/1j7gIGH-416UjdVidtekWgSwWaqCzgOsa/view?usp=sharing
+
+Total dimensions: 2007
+Column Name | Dimensions
+mid_initial_vector | 376
+mid_final_vector | 78
+mid_tone_vector | 4
+old_initial_vector | 211
+old_nucleus_vector | 7
+old_coda_vector | 54
+man_initial_vector | 21
+man_final_vector | 30
+man_tone_vector | 12
+can_onset_vector | 19
+can_nucleus_vector | 24
+can_coda_vector | 6
+can_tone_vector | 6
+seal_radical_vector | 537
+trad_radical_vector | 214
+simp_radical_vector | 214
+oracle_radical | 194

@@ -38,7 +38,7 @@ class BGE_C_MTEB_Wrapper(nn.Module):
         return torch.cat(all_embeddings, dim=0).numpy()
 
 def load_model():
-    checkpoint_path = "checkpoints/checkpoint-6000/model.safetensors"
+    checkpoint_path = "checkpoints/checkpoint-7462/model.safetensors"
     full_state_dict = load_file(checkpoint_path)
 
     # Filter state dict for LIBGEWrapper only
@@ -53,7 +53,7 @@ def load_model():
 
     # Build model
     ling_map = make_linguistic_dict()
-    libge_model = LIBGEWrapper(model_name="BAAI/bge-base-zh", linguistic_map=ling_map)
+    libge_model = LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map)
     libge_model.load_state_dict(filtered_state_dict)
 
     model = BGE_C_MTEB_Wrapper(libge_model, tokenizer_name=MODEL_NAME, max_length=128, pooling="mean")
@@ -65,6 +65,6 @@ def benchmark_model(model):
     evaluation.run(model, output_folder="mteb_results/base")
     
 if __name__ == "__main__":
-    model = get_model(MODEL_NAME)
+    model = get_model(load_model())
     benchmark_model(model)
     print("Benchmarking completed.")
