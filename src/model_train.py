@@ -139,7 +139,7 @@ def test_ling_map():
 if __name__ == "__main__":
     DATASET = "C-MTEB/LCQMC"
     IS_RELOAD = False
-    CHECKPOINT_DIR = "./checkpoints"
+    CHECKPOINT_DIR = "./checkpoints/frozen"
     ds = load_dataset(DATASET)
     ds = ds.map(tokenize_with_text)
     print(f"Dataset size: {len(ds['train'])} training samples, {len(ds['validation'])} validation samples")
@@ -148,9 +148,9 @@ if __name__ == "__main__":
     model = ContrastiveLossModel(LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map))
 
     args = TrainingArguments(
-        output_dir="./checkpoints",
+        output_dir="./checkpoints_frozen",
         per_device_train_batch_size=32,
-        num_train_epochs=1,
+        num_train_epochs=5,
         learning_rate=2e-5,
         eval_strategy="steps",  # Important for early stopping
         eval_steps=500,

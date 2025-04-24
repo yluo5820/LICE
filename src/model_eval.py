@@ -38,7 +38,7 @@ class BGE_C_MTEB_Wrapper(nn.Module):
         return torch.cat(all_embeddings, dim=0).numpy()
 
 def load_model():
-    checkpoint_path = "checkpoints/checkpoint-7462/model.safetensors"
+    checkpoint_path = "checkpoints_frozen/checkpoint-31000/model.safetensors"
     full_state_dict = load_file(checkpoint_path)
 
     # Filter state dict for LIBGEWrapper only
@@ -62,9 +62,9 @@ def load_model():
 def benchmark_model(model):
     tasks = ["IFlyTek", "ThuNewsClusteringS2S.v2", "Ocnli", "MMarcoReranking", "BQ"]
     evaluation = MTEB(tasks=tasks)
-    evaluation.run(model, output_folder="mteb_results/base")
+    evaluation.run(model, output_folder="mteb_results/frozen_4epochs")
     
 if __name__ == "__main__":
-    model = get_model(load_model())
+    model = load_model()
     benchmark_model(model)
     print("Benchmarking completed.")
