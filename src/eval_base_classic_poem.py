@@ -2,6 +2,7 @@ import json
 import tqdm
 import torch
 from sentence_transformers import SentenceTransformer, util
+from sklearn.metrics import f1_score
 
 # Load dataset
 def load_jsonl(path):
@@ -40,3 +41,5 @@ for row in tqdm.tqdm(test):
 # Accuracy
 accuracy = sum(p == t for p, t in zip(preds, trues)) / len(trues)
 print(f"Accuracy: {accuracy:.4f}")
+f1 = f1_score(trues, preds)
+print(f"F1 Score: {f1:.4f}")

@@ -1,0 +1,34 @@
+{
+  "dataset_revision": "8a8b2caeda43f39e13c4bc5bea0f8a667896e10d",
+  "task_name": "ThuNewsClusteringS2S.v2",
+  "mteb_version": "1.38.1",
+  "scores": {
+    "test": [
+      {
+        "v_measures": {
+          "Level 0": [
+            0.431061,
+            0.409716,
+            0.383332,
+            0.420765,
+            0.356957,
+            0.406583,
+            0.414087,
+            0.405649,
+            0.401935,
+            0.379758
+          ]
+        },
+        "v_measure": 0.400984,
+        "v_measure_std": 0.020732,
+        "main_score": 0.400984,
+        "hf_subset": "default",
+        "languages": [
+          "cmn-Hans"
+        ]
+      }
+    ]
+  },
+  "evaluation_time": 10.455561399459839,
+  "kg_co2_emissions": null
+}

@@ -2,10 +2,11 @@ import torch
 from torch.nn.functional import cosine_similarity
 from transformers import AutoTokenizer
 import pandas as pd
-from model_train import LIBGEWrapper, make_linguistic_dict, MODEL_NAME, ContrastiveLossModel, tokenize_with_text
+from model_train import LIBGEWrapper, make_linguistic_dict, MODEL_NAME, ContrastiveLossModel, tokenize_with_text,MODERN,CLASSIC
 import tqdm
 from safetensors.torch import load_file
 import json
+from sklearn.metrics import f1_score
 
 # Load data
 def load_jsonl(path):
@@ -15,9 +16,9 @@ def load_jsonl(path):
 test = load_jsonl("ccpm_split_test.jsonl")
 
 # Load model
-ling_map, dim = make_linguistic_dict()
+ling_map, dim = make_linguistic_dict(CLASSIC)
 model = ContrastiveLossModel(LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map, feature_dims=dim))
-states = load_file("checkpoints_poem/checkpoint-4900/model.safetensors", device="cpu")  # replace XXXX with actual number
+states = load_file("checkpoints_poem_classic/checkpoint-4900/model.safetensors", device="cpu")  # replace XXXX with actual number
 model.load_state_dict(states)  # replace XXXX with actual number
 model.eval()
 

@@ -1,0 +1,26 @@
+{
+  "dataset_revision": "8e0c766dbe9e16e1d221116a3f36795fbade07f6",
+  "task_name": "MMarcoReranking",
+  "mteb_version": "1.38.1",
+  "scores": {
+    "dev": [
+      {
+        "map": 0.206213,
+        "mrr": 0.194579,
+        "nAUC_map_max": 0.131975,
+        "nAUC_map_std": -0.190048,
+        "nAUC_map_diff1": 0.372409,
+        "nAUC_mrr_max": 0.114583,
+        "nAUC_mrr_std": -0.204928,
+        "nAUC_mrr_diff1": 0.356878,
+        "main_score": 0.206213,
+        "hf_subset": "default",
+        "languages": [
+          "cmn-Hans"
+        ]
+      }
+    ]
+  },
+  "evaluation_time": 1517.163810968399,
+  "kg_co2_emissions": null
+}

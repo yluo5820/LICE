@@ -1,0 +1,43 @@
+{
+  "dataset_revision": "e3dda5e115e487b39ec7e618c0c6a29137052a55",
+  "task_name": "BQ",
+  "mteb_version": "1.38.1",
+  "scores": {
+    "validation": [
+      {
+        "pearson": 0.618893,
+        "spearman": 0.62878,
+        "cosine_pearson": 0.618893,
+        "cosine_spearman": 0.62878,
+        "manhattan_pearson": 0.622009,
+        "manhattan_spearman": 0.639822,
+        "euclidean_pearson": 0.622767,
+        "euclidean_spearman": 0.640815,
+        "main_score": 0.62878,
+        "hf_subset": "default",
+        "languages": [
+          "cmn-Hans"
+        ]
+      }
+    ],
+    "test": [
+      {
+        "pearson": 0.581977,
+        "spearman": 0.591908,
+        "cosine_pearson": 0.581977,
+        "cosine_spearman": 0.591908,
+        "manhattan_pearson": 0.58517,
+        "manhattan_spearman": 0.601667,
+        "euclidean_pearson": 0.586428,
+        "euclidean_spearman": 0.603054,
+        "main_score": 0.591908,
+        "hf_subset": "default",
+        "languages": [
+          "cmn-Hans"
+        ]
+      }
+    ]
+  },
+  "evaluation_time": 204.48015117645264,
+  "kg_co2_emissions": null
+}
