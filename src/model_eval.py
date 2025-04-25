@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoTokenizer
-from model_train import LIBGEWrapper, DIM_LING_INFO, MODEL_NAME, make_linguistic_dict
+from model_train import LIBGEWrapper, MODEL_NAME, make_linguistic_dict, MODERN
 from safetensors.torch import load_file
 from torch import nn
 import torch
@@ -38,7 +38,7 @@ class BGE_C_MTEB_Wrapper(nn.Module):
         return torch.cat(all_embeddings, dim=0).numpy()
 
 def load_model():
-    checkpoint_path = "checkpoints_frozen/checkpoint-31000/model.safetensors"
+    checkpoint_path = "checkpoints_frozen_modern/checkpoint-7462/model.safetensors"
     full_state_dict = load_file(checkpoint_path)
 
     # Filter state dict for LIBGEWrapper only
@@ -52,8 +52,8 @@ def load_model():
             filtered_state_dict[new_key] = v
 
     # Build model
-    ling_map = make_linguistic_dict()
-    libge_model = LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map)
+    ling_map, dim = make_linguistic_dict(MODERN)
+    libge_model = LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map, feature_dims=dim)
     libge_model.load_state_dict(filtered_state_dict)
 
     model = BGE_C_MTEB_Wrapper(libge_model, tokenizer_name=MODEL_NAME, max_length=128, pooling="mean")
@@ -62,7 +62,7 @@ def load_model():
 def benchmark_model(model):
     tasks = ["IFlyTek", "ThuNewsClusteringS2S.v2", "Ocnli", "MMarcoReranking", "BQ"]
     evaluation = MTEB(tasks=tasks)
-    evaluation.run(model, output_folder="mteb_results/frozen_4epochs")
+    evaluation.run(model, output_folder="mteb_results/frozen_modern")
     
 if __name__ == "__main__":
     model = load_model()

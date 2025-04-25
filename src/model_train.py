@@ -14,21 +14,31 @@ from transformers import EarlyStoppingCallback
 import os
 os.environ["WANDB_DISABLED"] = "true"
 
-DIM_LING_INFO = 2007
 MODEL_NAME = "BAAI/bge-base-zh-v1.5"
 MAX_LEN = 128
+LINGUISTIC_FEATURE = [
+    'mid_initial_vector', 'mid_final_vector', 'mid_tone_vector', 
+    'old_initial_vector', 'old_nucleus_vector', 'old_coda_vector',
+    'man_initial_vector', 'man_final_vector', 'man_tone_vector',
+    'can_onset_vector', 'can_nucleus_vector', 'can_coda_vector', 'can_tone_vector',
+    'seal_radical_vector', 'trad_radical_vector', 'simp_radical_vector', 'oracle_radical'
+]
+MANDARIN = [6,7,8,14,15]
+CLASSIC = [0,1,2,3,4,5,13,14,16]
+MODERN = [6,7,8,9,10,11,12,14,15]
 
 ## 2. Custom Model Definition
 class LIBGEWrapper(nn.Module):
-    def __init__(self, model_name, pooling="mean", linguistic_map=None):
+    def __init__(self, model_name, pooling="mean", linguistic_map=None, feature_dims=2007):
         super().__init__()
         self.model = AutoModel.from_pretrained(model_name)
         for param in self.model.parameters():
           param.requires_grad = False
         self.pooling = pooling
+        self.feature_dims = feature_dims
         hidden_dim = self.model.config.hidden_size
         self.fusion = nn.Sequential(
-            nn.Linear(DIM_LING_INFO, hidden_dim),
+            nn.Linear(feature_dims, hidden_dim),
             nn.ReLU(),
             nn.Dropout(0.1)
         )
@@ -39,14 +49,14 @@ class LIBGEWrapper(nn.Module):
         vec = self.linguistic_map.get(char)
         if vec is not None:
             return torch.tensor(vec, dtype=torch.float32)
-        return torch.zeros(DIM_LING_INFO, dtype=torch.float32)
+        return torch.zeros(self.feature_dims, dtype=torch.float32)
 
     def forward(self, input_ids, attention_mask, raw_text):
         output = self.model(input_ids=input_ids, attention_mask=attention_mask)
         batch_vectors = []
         for sentence in raw_text:
             char_vecs = [self.char_to_vector(c).to(input_ids.device) for c in sentence]
-            char_vecs += [torch.zeros(DIM_LING_INFO).to(input_ids.device)] * (input_ids.shape[1] - len(char_vecs))
+            char_vecs += [torch.zeros(self.feature_dims).to(input_ids.device)] * (input_ids.shape[1] - len(char_vecs))
             char_vecs = char_vecs[:input_ids.shape[1]]
             batch_vectors.append(torch.stack(char_vecs))
         raw_text_vectors = torch.stack(batch_vectors)
@@ -82,7 +92,6 @@ class ContrastiveLossModel(nn.Module):
 
 ## 4. Tokenization & Data Processing
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
 def tokenize_with_text(example):
     tok1 = tokenizer(example["sentence1"], truncation=True, padding="max_length", max_length=MAX_LEN)
     tok2 = tokenizer(example["sentence2"], truncation=True, padding="max_length", max_length=MAX_LEN)
@@ -93,7 +102,7 @@ def tokenize_with_text(example):
         "input_ids2": tok2["input_ids"],
         "attention_mask2": tok2["attention_mask"],
         "raw_text2": list(example["sentence2"]),
-        "label": float(example["score"]),
+        "label": example["score"],
     }
 
 def collate_fn(batch):
@@ -108,16 +117,22 @@ def collate_fn(batch):
         "labels": torch.tensor([item["label"] for item in batch], dtype=torch.float)
     }
 ## 5. Load Linguistic Map
-def make_linguistic_dict():
+def make_linguistic_dict(features=None):
+    columns = []
+    if features is None:
+        columns = LINGUISTIC_FEATURE
+    else:
+        columns = [LINGUISTIC_FEATURE[f] for f in features]
+    dim = 0
     df = pd.read_csv("Chinese_linguistic_data.csv")
-    one_hot_columns = df.columns[2:]
-    for col in one_hot_columns:
+    for col in columns:
         df[col] = df[col].apply(ast.literal_eval)
-    df['full_vector'] = df[one_hot_columns].apply(lambda row: list(np.concatenate(row.values)), axis=1)
+        dim += len(df[col][0])
+    df['full_vector'] = df[columns].apply(lambda row: list(np.concatenate(row.values)), axis=1)
     char_to_vector = dict(zip(df['char'], df['full_vector']))
     del df
     gc.collect()
-    return char_to_vector
+    return char_to_vector, dim
 
 ## 6. Metrics
 def compute_metrics(eval_pred):
@@ -143,14 +158,14 @@ if __name__ == "__main__":
     ds = load_dataset(DATASET)
     ds = ds.map(tokenize_with_text)
     print(f"Dataset size: {len(ds['train'])} training samples, {len(ds['validation'])} validation samples")
-    ling_map = make_linguistic_dict()
+    ling_map, dim = make_linguistic_dict(CLASSIC)
 
-    model = ContrastiveLossModel(LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map))
+    model = ContrastiveLossModel(LIBGEWrapper(model_name=MODEL_NAME, linguistic_map=ling_map, feature_dims=dim))
 
     args = TrainingArguments(
-        output_dir="./checkpoints_frozen",
+        output_dir="./checkpoints_frozen_modern",
         per_device_train_batch_size=32,
-        num_train_epochs=5,
+        num_train_epochs=1,
         learning_rate=2e-5,
         eval_strategy="steps",  # Important for early stopping
         eval_steps=500,
